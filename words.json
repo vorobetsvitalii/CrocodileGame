@@ -1,0 +1,18 @@
+{
+    "easy": [
+        "word",
+        "peace",
+        "apple",
+        "pineaple",
+        "app"
+    ],
+    "medium": [
+        "press",
+        "bed"
+    ],
+    "hard": [
+        "window",
+        "laptop",
+        "web-site"
+    ]
+}
