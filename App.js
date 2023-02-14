@@ -4,20 +4,23 @@ import { StyleSheet, Text, TouchableOpacity, View, Linking, BackHandler } from '
 import words from './words.json';
 import { forwardRef, useState } from 'react';
 import EntypoIcon from 'react-native-vector-icons/Entypo'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 export default function App() {
   const [mode, SetMode] = useState("");
   const [menu, SetMenu] = useState(true);
-  const [rand, SetRand] = useState(Math.floor(Math.random() * 5));
+  const [rand, SetRand] = useState();
+  const [eyeIcon, SetEyeIcon] = useState("eye-outline")
+  const [prevRand, SetPrevRand] = useState();
 
   BackHandler.addEventListener('hardwareBackPress', function () {
     if (menu) {
       BackHandler.exitApp()
       return true;
     }
-    else{
+    else {
       SetMenu(true)
-    return true;
+      return true;
     }
   });
 
@@ -25,17 +28,17 @@ export default function App() {
     return (
       <View>
         <TouchableOpacity style={styles.levelButton}
-          onPress={() => { SetMode('easy'); SetMenu(false) }}
+          onPress={() => { SetMode('easy'); SetMenu(false);SetRand(Math.floor(Math.random() * 25)) }}
         >
           <Text style={styles.levelText}>Легкий</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.levelButton}
-          onPress={() => { SetMode('medium'); SetMenu(false) }}
+          onPress={() => { SetMode('medium'); SetMenu(false);SetRand(Math.floor(Math.random() * 25)) }}
         >
           <Text style={styles.levelText}>Середній</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.levelButton}
-          onPress={() => { SetMode('hard'); SetMenu(false) }}
+          onPress={() => { SetMode('hard'); SetMenu(false); SetRand(Math.floor(Math.random() * 25)) }}
         >
           <Text style={styles.levelText}>Складний</Text>
         </TouchableOpacity>
@@ -45,8 +48,15 @@ export default function App() {
 
   const WordScreen = () => {
     const numberOfWords = mode === 'easy' ? words.easy.length : mode === "medium" ? words.medium.length : words.hard.length
+    console.log(rand, " ", prevRand)
+    let n = rand
+    while(n === prevRand) {
+      n = (Math.floor(Math.random() * numberOfWords))
+      SetRand(n)
+      console.log(n, "   ", prevRand)
+    }
+    console.log("lnlk")
     const currentWord = mode === 'easy' ? words.easy[rand] : mode === "medium" ? words.medium[rand] : words.hard[rand]
-    //SetRand(Math.floor(Math.random() * numberOfWords))
     return (
       <View>
         <EntypoIcon
@@ -64,10 +74,21 @@ export default function App() {
         >
           <Text style={styles.nextWordText}>Дізнатися значення слова</Text>
         </TouchableOpacity>
-        <Text style={styles.wordStyle}>{currentWord}</Text>
+        <TouchableOpacity style={styles.hideCircle}
+        onPress={()=>{
+          eyeIcon === "eye-outline" ? SetEyeIcon("eye-off-outline") : SetEyeIcon("eye-outline")
+        }}
+        >
+          <Ionicons
+          name = {eyeIcon}
+          size={vh(5)}
+          />
+        </TouchableOpacity>
+        <Text style={styles.wordStyle}>{eyeIcon === "eye-outline" ? currentWord : "*****"}</Text>
         <TouchableOpacity style={styles.nextWord}
           onPress={() => {
             SetRand(Math.floor(Math.random() * numberOfWords))
+            SetPrevRand(rand)
           }}
         >
           <Text style={styles.nextWordText}>Наступне слово</Text>
@@ -142,5 +163,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  hideCircle: {
+    position: 'absolute',
+    width: vh(10),
+    height: vh(10),
+    borderRadius: 100,
+    marginTop: vh(-20),
+    alignSelf: 'center',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });
